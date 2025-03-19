@@ -23,6 +23,7 @@
 <script>
 import addInput from "./components/Input.vue";
 import todoView from "./components/Todos.vue";
+import db from "./firebase.config.js";
 
 export default {
   name: 'App',
@@ -36,25 +37,46 @@ export default {
     }
   },
   methods: {
-    addTodo: function (todoName) {
-      this.todos.push({
-        id: Date.now(),
-        todoName: todoName,
-        status: false
+    addTodo: async function (todoName) {
+      db.collection("Todo").add({
+        "todoName": todoName,
+        "status": false
+      }).then(() => {
+        console.log("Document successfully written!");
+      }).catch((error) => {
+        alert("Error writing document: ", error);
       });
     },
-    updateTodo: function (updates) {
-      let newTodo = this.todos.find((todo) => todo.id == updates.id);
-      newTodo.todoName = updates.name;
+
+    updateTodo: async function (updates) {
+      db.collection("Todo").doc(updates.id).update({
+        todoName: updates.name,
+      }).then(() => {
+        console.log("Document successfully written!");
+      }).catch((error) => {
+        console.error("Error writing document: ", error);
+      });
     },
-    changeStatus: function (id) {
-      let newTodo = this.todos.find((todo) => todo.id == id);
-      newTodo.status = !newTodo.status;
+
+    changeStatus: function ({ id, updatedStatus }) {
+      db.collection("Todo").doc(id).update({
+        status: updatedStatus
+      }).then(() => {
+        console.log("Document successfully written!");
+      }).catch((error) => {
+        console.error("Error writing document: ", error);
+      });
     },
+
     deleteTodo: function (id) {
-      this.todos = this.todos.filter((todo) => todo.id != id);
+      db.collection("Todo").doc(id).delete().then(() => {
+        console.log("Document successfully deleted!");
+      }).catch((error) => {
+        console.error("Error removing document: ", error);
+      });
     }
   },
+
   computed: {
     pendingTodos: function () {
       return this.todos.filter((todo) => {
@@ -71,7 +93,19 @@ export default {
         }
       });
     },
-  }
+  },
+
+  created: async function () {
+    db.collection("Todo").onSnapshot((snapshot) => {
+      this.todos = [];
+
+      snapshot.docs.forEach(doc => {
+        this.todos.push({
+          ...doc.data(), id: doc.id
+        })
+      });
+    });
+  },
 }
 </script>
 

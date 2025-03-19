@@ -80,7 +80,7 @@ export default {
         },
 
         changeStatus: function () {
-            this.$emit("changeStatus", this.todo.id);
+            this.$emit("changeStatus", { id: this.todo.id, updatedStatus: !this.todo.status });
         },
 
         deleteTask: function () {
