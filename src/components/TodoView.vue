@@ -1,84 +1,51 @@
 <template>
     <div>
-        <h1>TO DO</h1>
+        <div class="header">
+            <h1>TO DO</h1>
+            <button v-on:click="logout">Log Out</button>
+        </div>
+
         <div id="root">
-            <addInput v-on:add="addTodo"></addInput>
+            <addInput></addInput>
             <div class="todos">
                 <h3>Pending Task</h3>
                 <div class="pending-task" v-if="pendingTodos.length > 0">
-                    <Todo v-bind:todo="todo" v-on:delete="deleteTodo" v-on:changeStatus="changeStatus"
-                        v-on:changeTodo="updateTodo" v-for="todo in pendingTodos" v-bind:key="todo.id"></Todo>
+                    <Todo v-bind:todo="todo" v-for="todo in pendingTodos" v-bind:key="todo.id"></Todo>
                 </div>
                 <div class="error" v-else>No Pending Task </div>
                 <div class="completed-task" v-if="completedTodos.length > 0">
                     <h3>Completed Task</h3>
-                    <Todo v-bind:todo="todo" class="completed" v-on:delete="deleteTodo" v-on:changeStatus="changeStatus"
-                        v-on:changeTodo="updateTodo" v-for="todo in completedTodos" v-bind:key="todo.id"></Todo>
+                    <Todo v-bind:todo="todo" class="completed" v-for="todo in completedTodos" v-bind:key="todo.id">
+                    </Todo>
                 </div>
 
             </div>
         </div>
-        <button v-on:click="logout">Log Out</button>
     </div>
 </template>
 
 <script>
 import addInput from "./Input.vue";
 import todoView from "./Todos.vue";
-import { db, auth } from "../firebase.config.js";
+import { auth } from "../firebase.config.js";
+import { mapState } from "pinia";
+import useTodoStore from "@/store/todoStore";
+import { mapActions } from "pinia";
 
 export default {
     name: 'TodoView',
+
     components: {
         "addInput": addInput,
         "Todo": todoView,
     },
-    data() {
-        return {
-            todos: [],
-            user: null
-        }
+
+    computed: {
+        ...mapState(useTodoStore, ["completedTodos", "pendingTodos"])
     },
+
     methods: {
-        addTodo: async function (todoName) {
-            db.collection("Todo").add({
-                "todoName": todoName,
-                "status": false,
-                "uid": this.user.uid
-            }).then(() => {
-                console.log("Document successfully written!");
-            }).catch((error) => {
-                alert("Error writing document: ", error);
-            });
-        },
-
-        updateTodo: async function (updates) {
-            db.collection("Todo").doc(updates.id).update({
-                todoName: updates.name,
-            }).then(() => {
-                console.log("Document successfully written!");
-            }).catch((error) => {
-                console.error("Error writing document: ", error);
-            });
-        },
-
-        changeStatus: function ({ id, updatedStatus }) {
-            db.collection("Todo").doc(id).update({
-                status: updatedStatus
-            }).then(() => {
-                console.log("Document successfully written!");
-            }).catch((error) => {
-                console.error("Error writing document: ", error);
-            });
-        },
-
-        deleteTodo(id) {
-            db.collection("Todo").doc(id).delete().then(() => {
-                console.log("Document successfully deleted!");
-            }).catch((error) => {
-                console.error("Error removing document: ", error);
-            });
-        },
+        ...mapActions(useTodoStore, ["loadTodos"]),
 
         logout: function () {
             auth.signOut().then(() => {
@@ -89,42 +56,32 @@ export default {
         }
     },
 
-    computed: {
-        pendingTodos: function () {
-            return this.todos.filter((todo) => {
-                if (!todo.status) {
-                    return todo;
-                }
-            });
-        },
-
-        completedTodos: function () {
-            return this.todos.filter((todo) => {
-                if (todo.status) {
-                    return todo;
-                }
-            });
-        },
-    },
-
     created: async function () {
-        const user = auth.currentUser;
-        this.user = user;
-
-        db.collection("Todo").where("uid", "==", this.user.uid).onSnapshot((snapshot) => {
-            this.todos = [];
-
-            snapshot.docs.forEach(doc => {
-                this.todos.push({
-                    ...doc.data(), id: doc.id
-                })
-            });
-        });
+        this.loadTodos();
     },
 }
 </script>
 
 <style>
+.header {
+    display: grid;
+    grid-template-columns: 10fr .5fr;
+}
+
+.header button {
+    width: max-content;
+    height: max-content;
+    align-self: center;
+    padding: .5rem 2rem;
+    background-color: #41cac3;
+    border: none;
+    cursor: pointer;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
 h1 {
     text-align: center;
     margin-top: 1rem;

@@ -1,10 +1,13 @@
 <template>
     <div class="add-container">
         <input type="text" v-model="todoName" v-on:keypress="checkDone" placeholder="Add Task">
-        <button v-on:click="addTodo">+</button>
+        <button v-on:click="addTodo(todoName)">+</button>
     </div>
 </template>
 <script>
+import useTodoStore from '@/store/todoStore';
+import { mapActions } from 'pinia';
+
 export default {
     name: "addInput",
     data() {
@@ -13,19 +16,14 @@ export default {
         }
     },
     methods: {
+        ...mapActions(useTodoStore, ["addTodo"]),
+
         checkDone: function (event) {
             if (event.key == "Enter") {
-                this.addTodo();
+                this.addTodo(this.todoName);
+                this.todoName = "";
             }
         },
-        addTodo: function () {
-            if (this.todoName.trim() == "") {
-                alert("Please Enter a Task Title")
-                return;
-            }
-            this.$emit("add", this.todoName.trim());
-            this.todoName = "";
-        }
     }
 }
 </script>

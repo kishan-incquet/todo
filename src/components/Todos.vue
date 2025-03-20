@@ -1,10 +1,12 @@
 <template>
     <div class="todo-container">
         <input type="checkbox" name="status" class="todoStatus" value="1" v-bind:disabled="isEdit"
-            v-bind:checked="todo.status" v-on:change="changeStatus">
+            v-bind:checked="todo.status" v-on:change="changeStatus({ id: todo.id, updatedStatus: !todo.status })">
+
         <input type="text" class="name" v-model="name" v-on:keydown="checkDone" v-bind:disabled="!isEdit">
+
         <div class="btns" v-show="!isEdit">
-            <button v-on:click="editTask" v-if="todo.status != 1">
+            <button v-on:click="editTask" v-if="!todo.status">
                 <svg fill="#3ea552" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20"
                     viewBox="0 0 32 32">
                     <path
@@ -12,7 +14,7 @@
                     </path>
                 </svg>
             </button>
-            <button v-on:click="deleteTask">
+            <button v-on:click="deleteTodo(todo.id)">
                 <svg fill="#e23f3f" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="20" height="20"
                     viewBox="0 0 48 48">
                     <path
@@ -54,21 +56,30 @@
 </template>
 
 <script>
+import useTodoStore from '@/store/todoStore';
+import { mapActions } from 'pinia';
+
 export default {
     name: "todoView",
+
     props: {
         todo: {
             type: Object,
             required: true
         }
     },
+
     data() {
         return {
             name: this.todo.todoName,
             isEdit: false,
         }
     },
+
     methods: {
+
+        ...mapActions(useTodoStore, ["updateTodo", "changeStatus", "deleteTodo"]),
+
         checkDone: function (event) {
             if (event.key == "Enter") {
                 this.change();
@@ -79,13 +90,6 @@ export default {
             this.isEdit = true;
         },
 
-        changeStatus: function () {
-            this.$emit("changeStatus", { id: this.todo.id, updatedStatus: !this.todo.status });
-        },
-
-        deleteTask: function () {
-            this.$emit("delete", this.todo.id)
-        },
 
         reject: function () {
             this.name = this.todo.todoName;
@@ -98,12 +102,16 @@ export default {
                 return;
             }
 
-            this.$emit("changeTodo", { "id": this.todo.id, "name": this.name.trim(), "status": false })
+            this.updateTodo({ "id": this.todo.id, "name": this.name.trim(), "status": false });
             this.isEdit = false;
         }
+
     },
+
 }
 </script>
+
+
 <style scoped>
 .todo-container {
     display: grid;

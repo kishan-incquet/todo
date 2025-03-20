@@ -1,10 +1,11 @@
 <template>
     <div class="container" id="login-section">
-        <h2>Login</h2>
+        <h2>{{ login ? "Login" : "Register" }}</h2>
         <input type="email" id="username" placeholder="Email" v-model="uEmail" />
         <input type="password" id="password" placeholder="Password" v-model="uPass" />
-        <button id="login-btn" v-on:click="registerUser()">Login</button>
-        <p>Don't have an account? <RouterLink to="/register">Register Here</RouterLink>
+        <button id="login-btn" v-on:click="loginUser()">{{ login ? "Login" : "Register" }}</button>
+
+        <p>Don't have an account? <a v-on:click.prevent="changeState"> {{ login ? "Login" : "Register" }} Here</a>
         </p>
         <p id="login-error-message" class="error-message"></p>
     </div>
@@ -15,29 +16,48 @@
 import { auth } from "../firebase.config";
 export default {
     "name": "MyLogin",
-    props: {
-        "name": {
-            type: String
-        }
-    },
+
     data() {
         return {
             uEmail: "",
             uPass: "",
+            login: true
         }
     },
+
     methods: {
-        registerUser: function () {
-            auth.signInWithEmailAndPassword(this.uEmail, this.uPass)
-                .then(() => {
-                    this.$router.push("/");
-                })
-                .catch((error) => {
-                    var errorMessage = (error.message);
-                    console.log(errorMessage);
-                });
+        changeState: function () {
+            this.login = !this.login;
+        },
+
+        loginUser: function () {
+            if (this.login) {
+                console.log("hello");
+
+                auth.signInWithEmailAndPassword(this.uEmail, this.uPass)
+                    .then(() => {
+                        this.$router.push("/");
+                    })
+                    .catch((error) => {
+                        var errorMessage = (error.message);
+                        console.log(errorMessage);
+                    });
+            } else {
+                auth.createUserWithEmailAndPassword(this.uEmail, this.uPass)
+                    .then(() => {
+                        this.$router.push("/")
+                    })
+                    .catch((error) => {
+                        var errorCode = error.code;
+                        var errorMessage = error.message;
+                        console.log(errorCode, errorMessage);
+
+                    });
+            }
         }
     }
+
+
 }
 </script>
 
@@ -117,9 +137,10 @@ button:disabled {
     display: block;
 }
 
-textarea {
-    min-height: 200px;
-    resize: vertical;
+
+a {
+    cursor: pointer;
+    text-decoration: underline;
 }
 
 #note-section h2 {
