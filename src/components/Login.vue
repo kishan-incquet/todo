@@ -5,8 +5,9 @@
         <input type="password" id="password" placeholder="Password" v-model="uPass" />
         <button id="login-btn" v-on:click="loginUser()">{{ login ? "Login" : "Register" }}</button>
 
-        <p>Don't have an account? <a v-on:click.prevent="changeState"> {{ login ? "Login" : "Register" }} Here</a>
-        </p>
+        <a v-on:click.prevent="changeState">{{ login ? "Don't have an account? Register" : `Already Has a account?
+            Login` }}
+            Here</a>
         <p id="login-error-message" class="error-message"></p>
     </div>
 </template>
