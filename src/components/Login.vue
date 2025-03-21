@@ -1,15 +1,16 @@
 <template>
-    <div class="container" id="login-section">
+    <v-card width="40%" class="my-16 mx-auto py-2 px-5" id="login-section">
         <h2>{{ login ? "Login" : "Register" }}</h2>
-        <input type="email" id="username" placeholder="Email" v-model="uEmail" />
-        <input type="password" id="password" placeholder="Password" v-model="uPass" />
-        <button id="login-btn" v-on:click="loginUser()">{{ login ? "Login" : "Register" }}</button>
+        <v-text-field type="email" id="username" placeholder="Email" v-model="uEmail"></v-text-field>
+        <v-text-field type="password" id="password" placeholder="Password" v-model="uPass"></v-text-field>
+        <v-btn id="login-btn" color="#41cac3" class="white--text" v-on:click="loginUser()">{{ login ? "Login" :
+            "Register" }}</v-btn>
 
         <a v-on:click.prevent="changeState">{{ login ? "Don't have an account? Register" : `Already Has a account?
             Login` }}
             Here</a>
         <p id="login-error-message" class="error-message"></p>
-    </div>
+    </v-card>
 </template>
 
 

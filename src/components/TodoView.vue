@@ -1,27 +1,27 @@
 <template>
-    <div>
-        <div class="header">
-            <h1>TO DO</h1>
-            <button v-on:click="logout">Log Out</button>
-        </div>
+    <v-card outlined class="mx-auto mt-5 pa-3 d-flex flex-column" width="50rem">
+        <v-btn v-on:click="logout" class="align-self-end">Log Out</v-btn>
+        <h3>TO DO </h3>
 
-        <div id="root">
-            <addInput></addInput>
-            <div class="todos">
-                <h3>Pending Task</h3>
-                <div class="pending-task" v-if="pendingTodos.length > 0">
-                    <Todo v-bind:todo="todo" v-for="todo in pendingTodos" v-bind:key="todo.id"></Todo>
-                </div>
-                <div class="error" v-else>No Pending Task </div>
-                <div class="completed-task" v-if="completedTodos.length > 0">
-                    <h3>Completed Task</h3>
-                    <Todo v-bind:todo="todo" class="completed" v-for="todo in completedTodos" v-bind:key="todo.id">
-                    </Todo>
-                </div>
+        <addInput></addInput>
+        <v-card outlined elevation="0" v-if="!loading" class="mt-5 pa-5">
+            <h3>Pending Task</h3>
+            <v-list class="pending-task" v-if="pendingTodos.length > 0">
+                <Todo v-bind:todo="todo" v-for="todo in pendingTodos" v-bind:key="todo.id"></Todo>
+            </v-list>
 
-            </div>
-        </div>
-    </div>
+            <v-banner class="my-1 text-center red--text" v-else>No Pending Task</v-banner>
+
+            <v-list class="completed-task" v-if="completedTodos.length > 0">
+                <h3>Completed Task</h3>
+                <Todo v-bind:todo="todo" v-for="todo in completedTodos" v-bind:key="todo.id">
+                </Todo>
+            </v-list>
+        </v-card>
+
+        <v-skeleton-loader v-if="loading" type="list-item-avatar" class="mx-auto my-6"
+            max-width="100%"></v-skeleton-loader>
+    </v-card>
 </template>
 
 <script>
@@ -41,7 +41,9 @@ export default {
     },
 
     computed: {
-        ...mapState(useTodoStore, ["completedTodos", "pendingTodos"])
+        ...mapState(useTodoStore, ["completedTodos", "pendingTodos", "loading"]),
+
+
     },
 
     methods: {
@@ -61,60 +63,3 @@ export default {
     },
 }
 </script>
-
-<style>
-.header {
-    display: grid;
-    grid-template-columns: 10fr .5fr;
-}
-
-.header button {
-    width: max-content;
-    height: max-content;
-    align-self: center;
-    padding: .5rem 2rem;
-    background-color: #41cac3;
-    border: none;
-    cursor: pointer;
-    color: white;
-    border-radius: 5px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-h1 {
-    text-align: center;
-    margin-top: 1rem;
-}
-
-#root {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-inline: auto;
-    border: 2px solid black;
-    width: max-content;
-    padding: 1rem;
-    border-radius: 10px;
-}
-
-.todos {
-    border: 2px solid black;
-    border-radius: 10px;
-    width: 31rem;
-    margin-top: 1rem;
-    padding-inline: 1rem;
-}
-
-.error {
-    text-align: center;
-    padding: .5rem 1rem;
-    border-radius: 10px;
-    color: rgba(220, 17, 17, 0.896);
-    margin-bottom: 1rem;
-}
-
-.completed .name {
-    text-decoration: line-through;
-}
-</style>

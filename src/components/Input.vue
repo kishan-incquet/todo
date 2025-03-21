@@ -1,8 +1,11 @@
 <template>
-    <div class="add-container">
-        <input type="text" v-model="todoName" v-on:keypress="checkDone" placeholder="Add Task">
-        <button v-on:click="addTodo(todoName)">+</button>
-    </div>
+    <v-card class="d-flex px-2" elevation="2" outlined width="100%">
+        <!-- <input type="text" v-model="todoName" v-on:keypress="checkDone" placeholder="Add Task"> -->
+        <v-text-field placeholder="Add Todo" v-model="todoName" v-on:keypress="checkDone"
+            hide-details="auto"></v-text-field>
+        <!-- <button v-on:click="addTodo(todoName)">+</button> -->
+        <v-icon large color="teal darken-2">mdi-plus</v-icon>
+    </v-card>
 </template>
 <script>
 import useTodoStore from '@/store/todoStore';
@@ -12,7 +15,8 @@ export default {
     name: "addInput",
     data() {
         return {
-            todoName: ""
+            todoName: "",
+
         }
     },
     methods: {
@@ -27,28 +31,3 @@ export default {
     }
 }
 </script>
-
-<style scoped>
-.add-container {
-    border: 2px solid black;
-    display: flex;
-    width: max-content;
-    border-radius: 10px;
-    padding: .2rem .5rem .2rem .5rem;
-}
-
-input {
-    border: none;
-    outline: none;
-    width: 30rem;
-}
-
-button {
-    background-color: transparent;
-    border: none;
-    outline: none;
-    font-size: 1.5rem;
-    cursor: pointer;
-    font-weight: bold;
-}
-</style>

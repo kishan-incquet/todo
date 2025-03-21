@@ -5,7 +5,8 @@ const useTodoStore = defineStore("TodoStore", {
 
   state: () => ({
     todos: [],
-    user: auth.currentUser
+    user: auth.currentUser,
+    loading: true
   }),
 
   getters: {
@@ -39,7 +40,9 @@ const useTodoStore = defineStore("TodoStore", {
             ...doc.data(), id: doc.id
           })
         });
+        this.loading = false;
       });
+
     },
 
     addTodo(todoName) {
