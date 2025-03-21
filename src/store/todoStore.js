@@ -6,7 +6,7 @@ const useTodoStore = defineStore("TodoStore", {
   state: () => ({
     todos: [],
     user: auth.currentUser,
-    loading: true
+    loading: true,
   }),
 
   getters: {
@@ -50,6 +50,7 @@ const useTodoStore = defineStore("TodoStore", {
         alert("Please Enter a Task Title")
         return;
       }
+      this.adding = true;
 
       db.collection("Todo").add({
         "todoName": todoName,
@@ -57,6 +58,7 @@ const useTodoStore = defineStore("TodoStore", {
         "uid": this.user.uid
       }).then(() => {
         console.log("Task Created!");
+        setTimeout(function () { this.adding = false }, 1000)
       }).catch((error) => {
         alert("Error Adding: ", error);
       });
